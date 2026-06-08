@@ -578,7 +578,6 @@ export default function App() {
     </div>
   );
 }
-
 function Stat({ label, value, highlight }: { label: string; value: string; highlight?: 'red' | 'green' }) {
   return (
     <div className="bg-gray-50 rounded-xl px-4 py-3">
