@@ -414,7 +414,7 @@ export default function App() {
   const isOver = totalKcal > target;
 
   const handleTargetSave = () => { const t = parseInt(tempTarget); if (!isNaN(t) && t > 500) { setTarget(t); setUserCalorieTarget(t); } setEditingTarget(false); };
-  if (!isNaN(w) && w > 0) { setUserWeight(w); localStorage.setItem('user_weight', String(w)); } setEditingWeight(false); };
+  const handleWeightSave = () => { const w = parseFloat(tempWeight); if (!isNaN(w) && w > 0) { setUserWeight(w); localStorage.setItem('user_weight', String(w)); } setEditingWeight(false); };
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
