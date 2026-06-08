@@ -70,11 +70,13 @@ function resolveIngredient(input: string): string {
   const name = input.trim().toLowerCase().replace(/\s+/g, ' ');
   const map: Record<string, string> = {
     bannana: 'banana', bananna: 'banana', appel: 'apple', aple: 'apple',
-    chiken: 'chicken', chickn: 'chicken', chedken: 'chicken',
-    jogurt: 'yogurt', yoghurt: 'yogurt', yogourt: 'yogurt',
+    chiken: 'chicken', chickn: 'chicken', chedken: 'chicken', chicked: 'chicken',
+    chick: 'chicken', chikn: 'chicken', chicke: 'chicken', chciken: 'chicken',
+    jogurt: 'yogurt', yoghurt: 'yogurt', yogourt: 'yogurt', yougurt: 'yogurt',
     rise: 'rice', patato: 'potato', potatos: 'potato', potatoe: 'potato',
     patatoes: 'potato', brocoli: 'broccoli', mushrom: 'mushrooms',
     mushroon: 'mushrooms', carrott: 'carrots', carrotts: 'carrots',
+    carot: 'carrots', carots: 'carrots', caret: 'carrots',
     cucamber: 'cucumber', strawbery: 'strawberries', strawberyes: 'strawberries',
     tomatoe: 'tomatoes', tomatos: 'tomatoes', spnach: 'spinach', onin: 'onions',
     lens: 'lentils', lans: 'lentils', len: 'lentils', lentil: 'lentils',
@@ -82,6 +84,11 @@ function resolveIngredient(input: string): string {
     egg: 'eggs', mushroom: 'mushrooms', carrot: 'carrots', potato: 'potatoes',
     onion: 'onions', tomato: 'tomatoes', strawberry: 'strawberries',
     blueberry: 'blueberries', almond: 'almonds', peanut: 'peanuts', walnut: 'walnuts',
+    bred: 'bread', berad: 'bread', braed: 'bread', bred: 'bread',
+    salamon: 'salmon', samon: 'salmon', salamon: 'salmon', samlon: 'salmon',
+    tuna: 'tuna', tunna: 'tuna', toona: 'tuna',
+    bred: 'bread', avacado: 'avocado', avokado: 'avocado', avocato: 'avocado',
+    sweat: 'sweet potato', sweeet: 'sweet potato',
   };
   return map[name] || name;
 }
