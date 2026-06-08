@@ -338,14 +338,20 @@ function generateDietRecommendation(totalCalories: number, totalProtein: number,
 }
 
 export default function App() {
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>(() => {
+    const saved = localStorage.getItem('ingredients');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [inputName, setInputName] = useState('');
   const [inputGrams, setInputGrams] = useState('');
   const [inputKcal, setInputKcal] = useState('');
   const [target, setTarget] = useState(() => getUserCalorieTarget());
   const [editingTarget, setEditingTarget] = useState(false);
   const [tempTarget, setTempTarget] = useState(String(getUserCalorieTarget()));
-  const [userWeight, setUserWeight] = useState<number | null>(null);
+  const [userWeight, setUserWeight] = useState<number | null>(() => {
+    const saved = localStorage.getItem('user_weight');
+    return saved ? parseFloat(saved) : null;
+  });
   const [editingWeight, setEditingWeight] = useState(false);
   const [tempWeight, setTempWeight] = useState('');
 
@@ -360,7 +366,11 @@ export default function App() {
     const hasManual = manualKcal !== null && !isNaN(manualKcal) && manualKcal >= 0;
     const id = generateId();
     const newIng: Ingredient = { id, name: correctedName, originalName: wasCorrected ? rawName : undefined, grams, kcalPer100g: hasManual ? manualKcal : null, proteinPer100g: null, status: hasManual ? 'found' : 'loading' };
-    setIngredients(prev => [...prev, newIng]);
+    setIngredients(prev => {
+      const updated = [...prev, newIng];
+      localStorage.setItem('ingredients', JSON.stringify(updated));
+      return updated;
+    });
     setInputName(''); setInputGrams(''); setInputKcal('');
     if (!hasManual) {
       const internalData = lookupInternalDatabase(correctedName);
@@ -373,7 +383,11 @@ export default function App() {
     }
   }, [inputName, inputGrams, inputKcal]);
 
-  const removeIngredient = (id: string) => setIngredients(prev => prev.filter(ing => ing.id !== id));
+  const removeIngredient = (id: string) => setIngredients(prev => {
+    const updated = prev.filter(ing => ing.id !== id);
+    localStorage.setItem('ingredients', JSON.stringify(updated));
+    return updated;
+  });
   const updateGrams = (id: string, val: string) => { const g = parseFloat(val); if (!isNaN(g) && g >= 0) setIngredients(prev => prev.map(ing => ing.id === id ? { ...ing, grams: g } : ing)); };
   const updateKcal = (id: string, val: string) => { const k = val === '' ? null : parseFloat(val); setIngredients(prev => prev.map(ing => ing.id === id ? { ...ing, kcalPer100g: k !== null && !isNaN(k) ? k : null, status: val !== '' ? 'found' : ing.status } : ing)); };
 
@@ -400,7 +414,7 @@ export default function App() {
   const isOver = totalKcal > target;
 
   const handleTargetSave = () => { const t = parseInt(tempTarget); if (!isNaN(t) && t > 500) { setTarget(t); setUserCalorieTarget(t); } setEditingTarget(false); };
-  const handleWeightSave = () => { const w = parseFloat(tempWeight); if (!isNaN(w) && w > 0) setUserWeight(w); setEditingWeight(false); };
+  if (!isNaN(w) && w > 0) { setUserWeight(w); localStorage.setItem('user_weight', String(w)); } setEditingWeight(false); };
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
