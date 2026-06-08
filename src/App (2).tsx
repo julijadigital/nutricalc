@@ -429,7 +429,7 @@ export default function App() {
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ChefHat className="text-emerald-500" size={26} />
-            <h1 className="text-xl font-bold text-gray-900 tracking-tight">NutriCalc</h1>
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight">NutriCalc Pro</h1>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Target size={15} className="text-emerald-500" />
