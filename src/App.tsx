@@ -84,10 +84,10 @@ function resolveIngredient(input: string): string {
     egg: 'eggs', mushroom: 'mushrooms', carrot: 'carrots', potato: 'potatoes',
     onion: 'onions', tomato: 'tomatoes', strawberry: 'strawberries',
     blueberry: 'blueberries', almond: 'almonds', peanut: 'peanuts', walnut: 'walnuts',
-    bred: 'bread', berad: 'bread', braed: 'bread', bred: 'bread',
-    salamon: 'salmon', samon: 'salmon', salamon: 'salmon', samlon: 'salmon',
+    bred: 'bread', berad: 'bread', braed: 'bread',
+    salamon: 'salmon', samon: 'salmon', samlon: 'salmon',
     tuna: 'tuna', tunna: 'tuna', toona: 'tuna',
-    bred: 'bread', avacado: 'avocado', avokado: 'avocado', avocato: 'avocado',
+    avacado: 'avocado', avokado: 'avocado', avocato: 'avocado',
     sweat: 'sweet potato', sweeet: 'sweet potato',
   };
   return map[name] || name;
@@ -177,6 +177,11 @@ const INTERNAL_FOOD_DATABASE: Record<string, FoodNutrient> = {
   'almonds': { kcal: 579, protein: 21, quality: 0.9 },
   'peanuts': { kcal: 567, protein: 26, quality: 0.9 },
   'walnuts': { kcal: 654, protein: 9, quality: 0.9 },
+  'salmon': { kcal: 208, protein: 20, quality: 1.0 },
+  'chicken legs': { kcal: 184, protein: 24, quality: 1.0 },
+  'sweet potato': { kcal: 86, protein: 1.6, quality: 0.6 },
+  'avocado': { kcal: 160, protein: 2, quality: 0.8 },
+  'tuna': { kcal: 132, protein: 28, quality: 1.0 },
 };
 
 function lookupInternalDatabase(ingredient: string): FoodNutrient | null {
@@ -382,26 +387,42 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
     </div>
   );
 }
+
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [ingredients, setIngredients] = useState<Ingredient[]>(() => {
-    const saved = localStorage.getItem('ingredients');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('ingredients');
+      if (!saved) return [];
+      const parsed = JSON.parse(saved) as Ingredient[];
+      return parsed.map(ing => ({
+        ...ing,
+        status: ing.status === 'loading' ? 'not_found' : ing.status,
+      }));
+    } catch {
+      return [];
+    }
   });
   const [inputName, setInputName] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [inputGrams, setInputGrams] = useState('');
   const [inputKcal, setInputKcal] = useState('');
   const [target, setTarget] = useState(() => getUserCalorieTarget());
   const [editingTarget, setEditingTarget] = useState(false);
   const [tempTarget, setTempTarget] = useState(String(getUserCalorieTarget()));
   const [userWeight, setUserWeight] = useState<number | null>(() => {
-    const saved = localStorage.getItem('user_weight');
-    return saved ? parseFloat(saved) : null;
+    try {
+      const saved = localStorage.getItem('user_weight');
+      return saved ? parseFloat(saved) : null;
+    } catch {
+      return null;
+    }
   });
   const [editingWeight, setEditingWeight] = useState(false);
   const [tempWeight, setTempWeight] = useState('');
 
-  const addIngredient = useCallback(async () => {
+  if (!isAuthenticated) return <PasswordGate onUnlock={() => setIsAuthenticated(true)} />;
+
+  const addIngredient = async () => {
     const rawName = inputName.trim();
     if (!rawName || !inputGrams) return;
     const grams = parseFloat(inputGrams);
@@ -421,13 +442,21 @@ export default function App() {
     if (!hasManual) {
       const internalData = lookupInternalDatabase(correctedName);
       if (internalData) {
-        setIngredients(prev => prev.map(ing => ing.id === id ? { ...ing, kcalPer100g: internalData.kcal, proteinPer100g: internalData.protein, status: 'found' } : ing));
+        setIngredients(prev => {
+          const updated = prev.map(ing => ing.id === id ? { ...ing, kcalPer100g: internalData.kcal, proteinPer100g: internalData.protein, status: 'found' as const } : ing);
+          localStorage.setItem('ingredients', JSON.stringify(updated));
+          return updated;
+        });
       } else {
         const result = await fetchNutrition(correctedName);
-        setIngredients(prev => prev.map(ing => ing.id === id ? { ...ing, kcalPer100g: result !== null ? result.kcal : null, proteinPer100g: result !== null ? result.protein : 0, status: result !== null ? 'found' : 'not_found' } : ing));
+        setIngredients(prev => {
+          const updated = prev.map(ing => ing.id === id ? { ...ing, kcalPer100g: result !== null ? result.kcal : null, proteinPer100g: result !== null ? result.protein : 0, status: result !== null ? 'found' as const : 'not_found' as const } : ing);
+          localStorage.setItem('ingredients', JSON.stringify(updated));
+          return updated;
+        });
       }
     }
-  }, [inputName, inputGrams, inputKcal]);
+  };
 
   const removeIngredient = (id: string) => setIngredients(prev => {
     const updated = prev.filter(ing => ing.id !== id);
@@ -461,7 +490,6 @@ export default function App() {
 
   const handleTargetSave = () => { const t = parseInt(tempTarget); if (!isNaN(t) && t > 500) { setTarget(t); setUserCalorieTarget(t); } setEditingTarget(false); };
   const handleWeightSave = () => { const w = parseFloat(tempWeight); if (!isNaN(w) && w > 0) { setUserWeight(w); localStorage.setItem('user_weight', String(w)); } setEditingWeight(false); };
-  if (!isAuthenticated) return <PasswordGate onUnlock={() => setIsAuthenticated(true)} />;
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
@@ -625,6 +653,7 @@ export default function App() {
     </div>
   );
 }
+
 function Stat({ label, value, highlight }: { label: string; value: string; highlight?: 'red' | 'green' }) {
   return (
     <div className="bg-gray-50 rounded-xl px-4 py-3">
