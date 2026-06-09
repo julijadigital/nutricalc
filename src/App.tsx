@@ -344,8 +344,47 @@ function generateDietRecommendation(totalCalories: number, totalProtein: number,
   return 'Mixed Meal: Consider increasing protein or whole foods.';
 }
 
+function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
+  const [input, setInput] = useState('');
+  const [error, setError] = useState(false);
+  const CORRECT_PASSWORD = 'nutri2024';
+
+  const handleSubmit = () => {
+    if (input === CORRECT_PASSWORD) {
+      onUnlock();
+    } else {
+      setError(true);
+      setTimeout(() => setError(false), 2000);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100">
+      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">NutriCalc Pro</h1>
+        <p className="text-gray-500 text-sm mb-6">Enter your access password</p>
+        <input
+          type="password"
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+          placeholder="Password"
+          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+        />
+        {error && <p className="text-red-400 text-xs mb-2">Incorrect password. Try again.</p>}
+        <button
+          onClick={handleSubmit}
+          className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 rounded-xl transition-colors"
+        >
+          Access App
+        </button>
+      </div>
+    </div>
+  );
+}
 export default function App() {
   const [ingredients, setIngredients] = useState<Ingredient[]>(() => {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const saved = localStorage.getItem('ingredients');
     return saved ? JSON.parse(saved) : [];
   });
@@ -422,6 +461,7 @@ export default function App() {
 
   const handleTargetSave = () => { const t = parseInt(tempTarget); if (!isNaN(t) && t > 500) { setTarget(t); setUserCalorieTarget(t); } setEditingTarget(false); };
   const handleWeightSave = () => { const w = parseFloat(tempWeight); if (!isNaN(w) && w > 0) { setUserWeight(w); localStorage.setItem('user_weight', String(w)); } setEditingWeight(false); };
+  if (!isAuthenticated) return <PasswordGate onUnlock={() => setIsAuthenticated(true)} />;
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
