@@ -384,11 +384,11 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
 }
 export default function App() {
   const [ingredients, setIngredients] = useState<Ingredient[]>(() => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const saved = localStorage.getItem('ingredients');
     return saved ? JSON.parse(saved) : [];
   });
   const [inputName, setInputName] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [inputGrams, setInputGrams] = useState('');
   const [inputKcal, setInputKcal] = useState('');
   const [target, setTarget] = useState(() => getUserCalorieTarget());
