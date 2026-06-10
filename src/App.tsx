@@ -1,9 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Plus, Trash2, Flame, Target, ChefHat, Loader2 } from 'lucide-react';
 
-// =====================================================================
-// NUTRITION COACH PLUGIN (ISOLATED - NO MODIFICATIONS TO EXISTING LOGIC)
-// =====================================================================
 const nutritionCoach = {
   dailyTargets: (userWeight: number | null, calorieTarget: number = DEFAULT_CALORIE_TARGET, proteinMultiplier: number = DEFAULT_PROTEIN_MULTIPLIER) => ({
     calorieTarget,
@@ -364,22 +361,22 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">NutriCalc Pro</h1>
-        <p className="text-gray-500 text-sm mb-6">Enter your access password</p>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #f0fdf4, #d1fae5)', padding: '16px', boxSizing: 'border-box' }}>
+      <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 4px 24px rgba(0,0,0,0.10)', padding: '40px 32px', width: '100%', maxWidth: '360px', textAlign: 'center', boxSizing: 'border-box' }}>
+        <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px', marginTop: 0 }}>NutriCalc Pro</h1>
+        <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '24px', marginTop: 0 }}>Enter your access password</p>
         <input
           type="password"
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSubmit()}
           placeholder="Password"
-          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '12px 16px', fontSize: '16px', marginBottom: '12px', boxSizing: 'border-box', outline: 'none', WebkitAppearance: 'none' }}
         />
-        {error && <p className="text-red-400 text-xs mb-2">Incorrect password. Try again.</p>}
+        {error && <p style={{ color: '#f87171', fontSize: '12px', marginBottom: '8px' }}>Incorrect password. Try again.</p>}
         <button
           onClick={handleSubmit}
-          className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 rounded-xl transition-colors"
+          style={{ width: '100%', background: '#10b981', color: 'white', fontWeight: '600', padding: '14px', borderRadius: '12px', border: 'none', fontSize: '16px', cursor: 'pointer', WebkitAppearance: 'none' }}
         >
           Access App
         </button>
